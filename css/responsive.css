@@ -1,0 +1,714 @@
+/* ==================================================== */
+/*  animations, transitions & micro-interactions        */
+/* ==================================================== */
+
+/* --- page reveal --- */
+.page {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: pageAppear 0.6s ease forwards;
+
+  button {
+    transition: var(--general-transition);
+
+    &:hover {
+      transform: var(--translate-hover);
+      box-shadow: var(--general-shadow);
+
+      &:active {
+        opacity: 0.7;
+        transform: var(--translate-active);
+      }
+    }
+  }
+}
+
+@keyframes pageAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wrapArrow {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  45% {
+    transform: translateX(20px);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  51% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes popoutFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes formPop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popoutFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes formPopOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+
+@keyframes successFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================================================== */
+/*                      index.html                      */
+/* ==================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+.site-header {
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+
+  &.hide {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  nav {
+    ul {
+      li {
+        a {
+          transition: all 0.3s ease;
+
+          &:hover {
+            color: #410dce;
+            text-shadow: 0 6px 5px rgba(0, 0, 0, 0.5);
+            scale: 1.1;
+
+            &:active {
+              color: #2d0c8a;
+              scale: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.site-footer {
+  nav {
+    ul {
+      li {
+        a {
+          transition: all 0.3s ease;
+
+          &:hover {
+            color: #cfd8e0;
+            text-shadow: 0 6px 5px rgba(0, 0, 0, 0.5);
+            scale: 1.1;
+
+            &:active {
+              color: #96a1ab;
+              scale: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                       home.html                      */
+/* ==================================================== */
+
+.home {
+  .button {
+    &:has(button:disabled) {
+      cursor: not-allowed;
+    }
+
+    button {
+      &:disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.4;
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                      about.html                      */
+/* ==================================================== */
+
+.about {
+  .stats {
+    div {
+      transition: var(--general-transition);
+
+      &:hover {
+        transform: var(--translate-hover);
+        border: var(--hover-border);
+        box-shadow: var(--general-shadow);
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                     service.html                     */
+/* ==================================================== */
+
+.service {
+  .card-holder {
+    .card {
+      transition: var(--general-transition);
+
+      &:hover {
+        transform: var(--translate-hover);
+        box-shadow: var(--general-shadow);
+        border: 1px solid #5b7191;
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                       why.html                       */
+/* ==================================================== */
+
+.why {
+  .list {
+    p {
+      transition: var(--general-transition);
+
+      &:hover {
+        transform: var(--translate-hover);
+        box-shadow: var(--general-shadow);
+        border: 1px solid #5b7191;
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                     process.html                     */
+/* ==================================================== */
+
+.process {
+  .card-holder {
+    
+    > div {
+      .arrow {
+        &:hover {
+          animation: wrapArrow .9s linear; /* plays once per hover */
+        }
+      }
+    }
+
+    .card {
+      transition: var(--general-transition);
+
+      &:hover {
+        transform: translateX(6px);
+        box-shadow: -3px 0px 8px rgba(107, 85, 207, 0.5);
+        border: var(--general-border);
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                     contact.html                     */
+/* ==================================================== */
+
+.contact {
+  .card-holder {
+    .card {
+      transition: var(--general-transition);
+
+      &:hover {
+        border: var(--hover-border);
+        transform: var(--translate-hover);
+        box-shadow: var(--general-shadow);
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                      form popout                     */
+/* ==================================================== */
+
+.popout {
+  &.active {
+    animation: popoutFade 0.3s ease forwards;
+  }
+
+  &.active .form {
+    animation: formPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+
+  &.closing {
+    animation: popoutFadeOut 0.3s ease forwards;
+  }
+
+  &.closing .form {
+    animation: formPopOut 0.3s ease forwards;
+  }
+
+  .form {
+    form {
+      .input-group {
+        input,
+        textarea {
+          transition: 0.25s;
+
+          &:focus {
+            border-color: #0f5eb3;
+            box-shadow: 0 0 4px 2px rgba(49, 154, 202, 0.15);
+            transform: translateY(-4px);
+          }
+        }
+
+        span {
+          transition: all 0.3s ease;
+        }
+      }
+
+      .button-group {
+        button {
+          transition: 0.25s;
+        }
+
+        button[type="submit"] {
+          &:hover {
+            background-color: #113f7d;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            transform: translateY(-4px);
+
+            &:active {
+              background-color: #1f3b68;
+              transform: translateY(-2px);
+            }
+          }
+        }
+
+        button[type="reset"] {
+          &:hover {
+            background-color: #cccccc;
+            color: #3a3a3a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            transform: translateY(-4px);
+
+            &:active {
+              background-color: rgb(219, 219, 219);
+              transform: translateY(-2px);
+            }
+          }
+        }
+      }
+    }
+
+    /* X close button: hover spins the badge */
+    .close {
+      .icon {
+        transition: var(--general-transition);
+      }
+
+      &:hover .icon {
+        background: #052950;
+        color: #fff;
+        transform: rotate(90deg);
+      }
+    }
+
+    .form-success {
+      animation: successFadeIn 0.4s ease;
+    }
+
+    .success-close {
+      transition: var(--general-transition);
+
+      &:hover {
+        background: #052950;
+        color: #fff;
+      }
+    }
+  }
+}
+
+/* ==================================================== */
+/*                    responsive                        */
+/* ==================================================== */
+
+/* the hamburger button only exists for small screens */
+.nav-toggle {
+  display: none;
+}
+
+/* keep anchor jumps clear of the fixed header */
+#home,
+#about,
+#service,
+#why,
+#process,
+#contact {
+  scroll-margin-top: 90px;
+}
+
+/* body scroll is locked while the mobile menu is open */
+body.menu-open {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------- */
+/*                  tablets (≤ 992px)                    */
+/* ---------------------------------------------------- */
+
+@media (max-width: 992px) {
+  .site-header {
+    padding: 0 24px;
+  }
+
+  .hero {
+    .title {
+      font-size: 36px;
+    }
+
+    .number {
+      font-size: 42px;
+    }
+  }
+
+  .service .card-holder > div {
+    flex: 0 0 calc((100% - 15px) / 2);
+  }
+
+  .why .list > p {
+    flex: 0 0 calc((100% - 15px) / 2);
+  }
+
+  .process .card-holder > div {
+    flex: 0 0 calc((100% - 15px) / 2);
+  }
+}
+
+/* ---------------------------------------------------- */
+/*                    phones (≤ 768px)                   */
+/* ---------------------------------------------------- */
+
+@media (max-width: 768px) {
+  /* ---- header + hamburger menu ---- */
+  .site-header {
+    padding: 0 16px;
+  }
+
+  .site-header .container {
+    padding: 12px 0;
+  }
+
+  .site-header h1,
+  .site-header h1 span {
+    font-size: 20px;
+  }
+
+  .site-header nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: min(78vw, 320px);
+    padding: 100px 24px 24px;
+    background: #fff;
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.18);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.35s;
+    z-index: 1001;
+
+    ul {
+      flex-direction: column;
+      gap: 6px;
+
+      li {
+        a {
+          font-size: 1.05rem;
+          padding: 14px 12px;
+          border-radius: 12px;
+
+          &:hover {
+            background: #eef3f8;
+            text-shadow: none;
+            scale: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .site-header.nav-open nav {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: #eef3f8;
+    color: var(--primary);
+    font-size: 1.35rem;
+    cursor: pointer;
+    transition: var(--general-transition);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    z-index: 1002;
+
+    &:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+  }
+
+  /* ---- shared page/hero sizing ---- */
+  .page {
+    padding: 10% 5%;
+    margin: 4% 0;
+    gap: 22px;
+
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+
+  .hero {
+    padding: 1% 0;
+
+    .title {
+      font-size: 28px;
+    }
+
+    .number {
+      font-size: 38px;
+    }
+
+    .description {
+      font-size: 0.95rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 20px;
+      touch-action: manipulation;
+    }
+  }
+
+  .home .image {
+    order: -1;
+  }
+
+  /* ---- about ---- */
+  .about .content .list > p {
+    flex: 1 1 100%;
+  }
+
+  .about .stats > div {
+    padding: 6%;
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  /* ---- service ---- */
+  .service {
+    padding: 10% 5%;
+
+    .card-holder {
+      gap: 18px;
+
+      > div {
+        flex: 1 1 100%;
+      }
+    }
+
+    .card {
+      padding: 5%;
+    }
+  }
+
+  /* ---- why ---- */
+  .why {
+    padding: 10% 5%;
+
+    .list {
+      gap: 12px;
+
+      > p {
+        flex: 1 1 100%;
+      }
+    }
+  }
+
+  /* ---- process ---- */
+  .process {
+    padding: 10% 5%;
+
+    .card-holder {
+      gap: 12px;
+
+      > div {
+        flex: 1 1 100%;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+      }
+
+      div .card {
+        padding: 6% 5%;
+      }
+    }
+  }
+
+  /* ---- contact ---- */
+  .contact .card-holder {
+    gap: 14px;
+
+    .card {
+      padding: 18px;
+    }
+  }
+
+  /* ---- footer ---- */
+  .site-footer {
+    padding: 24px 16px;
+
+    .container {
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .container:last-of-type {
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  /* ---- popout form ---- */
+  .popout {
+    padding: 10px;
+  }
+
+  .popout .form {
+    padding: 26px 18px;
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+    border-radius: 20px;
+
+    .description h2 {
+      font-size: 1.5rem;
+    }
+
+    form {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+
+      .input-group textarea {
+        min-height: 130px;
+      }
+    }
+
+    .close {
+      top: 12px;
+      right: 12px;
+    }
+  }
+}

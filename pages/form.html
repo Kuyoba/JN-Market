@@ -1,0 +1,56 @@
+
+<section class="form">
+    <button type="button" class="close" aria-label="Fermer">
+        <span class="fi-rr-cross icon"></span>
+    </button>
+
+    <div class="description">
+        <h2>Envoyez-nous un message</h2>
+        <p>nous répondons sous un jour ouvrable</p>
+    </div>
+
+    <form novalidate action="https://formspree.io/f/xykrdzye" method="POST">
+        <div class="input-group">
+            <label>Nom</label>
+            <input type="text" id="name" name="name">
+            <span id="name-res"></span>
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="email" name="email">
+                <span id="email-res"></span>
+            </div>
+
+            <div class="input-group">
+                <label>Téléphone</label>
+                <input type="text" id="phone" name="phone">
+                <span id="phone-res"></span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Message</label>
+            <textarea id="message" name="message"></textarea>
+            <span id="message-res"></span>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">
+                Envoyer le message
+                <span class="fi-rr-arrow-right"></span>
+            </button>
+
+            <button type="reset">Annuler</button>
+        </div>
+        <p id="form-error" class="form-error hidden"></p>
+    </form>
+
+    <div class="form-success hidden">
+        <span class="fi-rr-check"></span>
+        <h3>Message envoyé !</h3>
+        <p>merci de nous avoir contactés - nous répondons sous un jour ouvrable.</p>
+        <button type="button" class="success-close">fermer</button>
+    </div>
+</section>

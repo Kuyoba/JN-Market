@@ -78,6 +78,32 @@ function initValidation(form) {
     });
   });
 }
+// Send the form to Web3Forms and return the fetch Response.
+// The caller is responsible for the success/error UI.
+async function submitForm(form) {
+  var submitBtn = form.querySelector("button[type='submit']");
+  var originalText = submitBtn ? submitBtn.textContent : "";
+  if (submitBtn) {
+    submitBtn.textContent = "Envoi...";
+    submitBtn.disabled = true;
+  }
+
+  try {
+    // the hidden <input name="access_key"> is already inside the form
+    var response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: new FormData(form),
+    });
+    var data = await response.json();
+    // so trust the success flag in the body rather than just response.ok.
+    return { ok: response.ok && data.success, message: data.message };
+  } finally {
+    if (submitBtn) {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  }
+}
 
 /* ==================================================== */
 /*                      popout form                     */
@@ -111,15 +137,9 @@ function initPopout() {
     if (errorLine) errorLine.classList.add("hidden");
     submitting = true;
     try {
-      // send the form to Formspree, which emails it to the site owner
-      const response = await fetch(form.action, {
-        method: form.method || "POST",
-        body: new FormData(form),
-        headers: { Accept: "application/json" }, // Formspree replies with JSON when asked
-      });
-      if (!response.ok) throw new Error("HTTP " + response.status);
-
-      // real success: replace the form with the confirmation
+      const result = await submitForm(form);
+      if (!result.ok)
+        throw new Error(result.message || "La requête a échoué.");
       form.classList.add("hidden");
       popout.querySelector(".form-success").classList.remove("hidden");
     } catch (err) {

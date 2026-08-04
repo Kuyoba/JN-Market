@@ -9,30 +9,31 @@
         <p>nous répondons sous un jour ouvrable</p>
     </div>
 
-    <form novalidate action="https://formspree.io/f/xykrdzye" method="POST">
+    <form novalidate name="form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="46418258-e9af-4abb-9d59-4e5377cde65a">
         <div class="input-group">
             <label>Nom</label>
-            <input type="text" id="name" name="name">
+            <input type="text" id="name" name="name" required>
             <span id="name-res"></span>
         </div>
 
         <div class="row">
             <div class="input-group">
                 <label>E-mail</label>
-                <input type="email" id="email" name="email">
+                <input type="email" id="email" name="email" required>
                 <span id="email-res"></span>
             </div>
 
             <div class="input-group">
                 <label>Téléphone</label>
-                <input type="text" id="phone" name="phone">
+                <input type="text" id="phone" name="phone" required>
                 <span id="phone-res"></span>
             </div>
         </div>
 
         <div class="input-group">
             <label>Message</label>
-            <textarea id="message" name="message"></textarea>
+            <textarea id="message" name="message" required></textarea>
             <span id="message-res"></span>
         </div>
 

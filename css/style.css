@@ -621,12 +621,19 @@ body {
         }
       }
 
+      /* the front button sits bottom-right in EVERY state: its position
+         must not depend on the flip, or the instant the flip starts it
+         would lose its right-anchor and jump to its static position
+         (bottom-left) mid-rotation — the desktop-only glitch. */
+      .flip-front .flip-badge {
+        right: 14px;
+      }
+
       /* the front button fades in only after the card has flipped back
          to the front (mirror of the back button). The :not(.flipped)
          part stops matching while the card is flipped, which restarts
          the animation on every unflip. */
       &:not(.flipped) .flip-front .flip-badge {
-        right: 14px;
         animation: badge-fade-in var(--badge-fade) ease var(--flip-duration) both;
       }
 

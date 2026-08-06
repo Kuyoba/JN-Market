@@ -1,15 +1,10 @@
-/* ==================================================== */
-/*                    form validation                    */
-/* ==================================================== */
+// form
 
-
-// One function that updates a field's border color AND the message under it.
+// colors a field's border and shows the message under it
 function setFieldState(field, state, message) {
-  // 1) color the input's border
   field.classList.remove("right-input", "wrong-input", "missing-input");
   if (state) field.classList.add(state + "-input");
 
-  // 2) show the message under the input, if it has a <span id="xxx-res">
   var result = document.getElementById(field.id + "-res");
   if (!result) return;
 
@@ -19,7 +14,7 @@ function setFieldState(field, state, message) {
   result.style.display = message ? "block" : "none";
 }
 
-// Check one field against its rule. Returns true when the field is valid.
+// checks one field against its rule
 function validateField(field) {
   var value = field.value.trim();
 
@@ -28,7 +23,6 @@ function validateField(field) {
     return false;
   }
 
-  // the rule each field must match
   var rules = {
     name: /^[a-zA-Z\s]+$/,
     email: /^[a-z0-9]+@[a-z]+\.[a-z]+$/i,
@@ -36,7 +30,6 @@ function validateField(field) {
     message: /.+/,
   };
 
-  // French label used in the messages below (the field ids stay in English)
   var labels = { name: "nom", email: "e-mail", phone: "téléphone", message: "message" };
   var label = labels[field.id] || field.id;
 
@@ -50,7 +43,7 @@ function validateField(field) {
   return true;
 }
 
-// Check every field in the form and focus the first bad one.
+// checks every field and focuses the first invalid one
 function validateForm(form) {
   var fields = form.querySelectorAll("input, textarea");
   var allValid = true;
@@ -66,7 +59,7 @@ function validateForm(form) {
   return allValid;
 }
 
-// Check a field 300ms after the user stops typing.
+// validates a field as the user types
 function initValidation(form) {
   form.querySelectorAll("input, textarea").forEach(function (field) {
     var timer = null;
@@ -78,8 +71,8 @@ function initValidation(form) {
     });
   });
 }
-// Send the form to Web3Forms and return the fetch Response.
-// The caller is responsible for the success/error UI.
+
+// sends the form to Web3Forms
 async function submitForm(form) {
   var submitBtn = form.querySelector("button[type='submit']");
   var originalText = submitBtn ? submitBtn.textContent : "";
@@ -89,13 +82,11 @@ async function submitForm(form) {
   }
 
   try {
-    // the hidden <input name="access_key"> is already inside the form
     var response = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
       body: new FormData(form),
     });
     var data = await response.json();
-    // so trust the success flag in the body rather than just response.ok.
     return { ok: response.ok && data.success, message: data.message };
   } finally {
     if (submitBtn) {
@@ -105,22 +96,22 @@ async function submitForm(form) {
   }
 }
 
-/* ==================================================== */
-/*                      popout form                     */
-/* ==================================================== */
-
+// closes the form popout
+var formCloseRequested = false;
 function closePopout() {
   var popout = document.getElementById("popout-form");
-  if (!popout.classList.contains("active")) return; // already closed or closing
+  // remember the close even while the form page is still loading
+  formCloseRequested = true;
+  if (!popout.classList.contains("active")) return;
 
-  popout.classList.add("closing"); // fade out first...
+  popout.classList.add("closing");
   setTimeout(function () {
     popout.classList.remove("active", "closing");
-    document.body.style.overflow = ""; // ...then unlock the page behind
-  }, 300); // matches the .closing animation duration (0.3s)
+    document.body.style.overflow = "";
+  }, 300);
 }
 
-// Wire up the form that was just loaded into the popout.
+// wires up the popout form (submit, reset, close)
 function initPopout() {
   var popout = document.getElementById("popout-form");
   var form = popout.querySelector("form");
@@ -129,9 +120,9 @@ function initPopout() {
 
   var submitting = false;
   form.addEventListener("submit", async function (e) {
-    e.preventDefault(); // we handle the send ourselves: no page reload
-    if (submitting) return; // ignore double-clicks while a send is in flight
-    if (!validateForm(form)) return; // don't send until every field is valid
+    e.preventDefault();
+    if (submitting) return;
+    if (!validateForm(form)) return;
 
     var errorLine = popout.querySelector(".form-error");
     if (errorLine) errorLine.classList.add("hidden");
@@ -154,7 +145,7 @@ function initPopout() {
   });
 
   form.addEventListener("reset", function () {
-    form.classList.remove("hidden"); // show the form again (if we were on the success screen)
+    form.classList.remove("hidden");
     popout.querySelector(".form-success").classList.add("hidden");
     var errorLine = popout.querySelector(".form-error");
     if (errorLine) errorLine.classList.add("hidden");
@@ -171,21 +162,26 @@ function initPopout() {
   if (first) first.focus();
 }
 
+// loads the form page into the popout
 var formLoading = false;
 async function loadFormPage() {
   var popout = document.getElementById("popout-form");
-  if (popout.classList.contains("active") || formLoading) return; // already open or loading
+  if (popout.classList.contains("active") || formLoading) return;
 
   formLoading = true;
+  formCloseRequested = false;
   try {
     const response = await fetch("pages/form.html");
     if (!response.ok) {
       throw new Error("HTTP " + response.status);
     }
 
+    // the user pressed Escape while the page was still loading
+    if (formCloseRequested) return;
+
     popout.innerHTML = await response.text();
     popout.classList.add("active");
-    document.body.style.overflow = "hidden"; // lock the page behind
+    document.body.style.overflow = "hidden";
     initPopout();
   } catch (err) {
     console.warn("Failed to load pages/form.html:", err.message);
@@ -194,16 +190,14 @@ async function loadFormPage() {
   }
 }
 
-/* ==================================================== */
-/*                     page loading                     */
-/* ==================================================== */
+// page
 
+// hides the header while scrolling
 function initScrollEffect() {
   var header = document.querySelector(".site-header");
   var scrollTimer = null;
 
   window.addEventListener("scroll", function () {
-    // don't hide the header while the mobile menu is open
     if (header.classList.contains("nav-open")) return;
     header.classList.add("hide");
     if (scrollTimer) clearTimeout(scrollTimer);
@@ -213,11 +207,7 @@ function initScrollEffect() {
   });
 }
 
-/* ==================================================== */
-/*                     mobile nav                       */
-/* ==================================================== */
-
-// Hamburger menu: slides the nav in from the right on small screens.
+// slides the mobile menu in from the right
 function initMobileNav() {
   var header = document.querySelector(".site-header");
   var toggle = document.querySelector(".nav-toggle");
@@ -242,29 +232,26 @@ function initMobileNav() {
     if (icon) icon.className = open ? "fi-rr-cross" : "fi-rr-menu-burger";
   });
 
-  // close after choosing a destination
   header.querySelectorAll("nav a").forEach(function (link) {
     link.addEventListener("click", closeMenu);
   });
 
-  // close with Escape
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenu();
   });
 
-  // close when tapping outside the header
   document.addEventListener("click", function (e) {
     if (!header.contains(e.target) && header.classList.contains("nav-open")) {
       closeMenu();
     }
   });
 
-  // reset the state when the viewport grows back to desktop
   window.addEventListener("resize", function () {
     if (window.innerWidth > 768) closeMenu();
   });
 }
 
+// loads the home page
 async function loadMainPage() {
   const container = document.getElementById("main-page");
   try {
@@ -280,6 +267,7 @@ async function loadMainPage() {
   }
 }
 
+// loads the remaining sections, hidden until "en savoir plus" is clicked
 var sectionsLoaded = false;
 async function pageFetch() {
   const container = document.getElementById("sub-pages");
@@ -296,17 +284,15 @@ async function pageFetch() {
 
       const data = await response.text();
       container.innerHTML += data;
-
       const section = document.getElementById(page);
-      if (section) {
-        section.classList.add("hidden");
-      }
+      if (section) section.classList.add("hidden");
     } catch (err) {
       console.warn(`Failed to load pages/${page}.html:`, err.message);
     }
   }
 }
 
+// reveals the hidden sections when "en savoir plus" is clicked
 function revealSections() {
   var container = document.getElementById("sub-pages");
   var sections = container.children;
@@ -320,12 +306,201 @@ function revealSections() {
     section.classList.remove("hidden");
   }
 
-  document.getElementById("discover").disabled = true;
+  // the reveal changes which sections exist, so refresh the active link
+  if (scrollSpyUpdate) scrollSpyUpdate();
+  var discover = document.getElementById("discover");
+  if (discover) discover.disabled = true;
+
+  // the front buttons fade in right after the reveal, so keep them
+  // disabled until that fade has finished (per-card generation guard,
+  // so an early flip can't be re-enabled by this stale timeout)
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var timing = flipTiming();
+  var delay = reduce ? 0 : timing.flip + timing.fade;
+  document
+    .querySelectorAll(".flip-card .flip-front .flip-badge")
+    .forEach(function (btn) {
+      var card = btn.closest(".flip-card");
+      var gen = (card._flipGen || 0) + 1;
+      card._flipGen = gen;
+      btn.disabled = true;
+      setTimeout(function () {
+        if (card._flipGen === gen) btn.disabled = false;
+      }, delay);
+    });
 }
 
-console.log("script.js loaded");
+// highlights the nav link of the section currently in view
+var scrollSpyUpdate = null;
+function initScrollSpy() {
+  var links = document.querySelectorAll(".nav-pill a");
+  var sections = Array.prototype.map.call(links, function (link) {
+    return document.getElementById(link.getAttribute("href").slice(1));
+  });
+
+  function update() {
+    var marker = window.innerHeight * 0.35;
+    var current = null;
+
+    for (var i = 0; i < sections.length; i++) {
+      var section = sections[i];
+      if (!section || section.classList.contains("hidden")) continue;
+      if (section.getBoundingClientRect().top <= marker) current = section;
+    }
+
+    links.forEach(function (link) {
+      link.classList.toggle(
+        "active",
+        current !== null && link.getAttribute("href") === "#" + current.id
+      );
+    });
+  }
+
+  scrollSpyUpdate = update;
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
+}
+
+// flip + fade timing (ms), read from the CSS variables so JS can never
+// drift apart from the badge-fade-in animation
+function flipTiming() {
+  var root = getComputedStyle(document.documentElement);
+  var dur = parseFloat(root.getPropertyValue("--flip-duration"));
+  var fade = parseFloat(root.getPropertyValue("--badge-fade"));
+  return {
+    flip: isFinite(dur) ? dur * 1000 : 650,
+    fade: isFinite(fade) ? fade * 1000 : 300,
+  };
+}
+
+// flips a service card and syncs its accessibility state
+function toggleFlipCard(card) {
+  var flipped = card.classList.toggle("flipped");
+
+  // every flip disables both buttons; the one that just became visible
+  // is re-enabled once its fade-in has finished
+  card.querySelectorAll(".flip-badge").forEach(function (btn) {
+    btn.setAttribute("aria-pressed", flipped ? "true" : "false");
+    btn.disabled = true;
+  });
+
+  var front = card.querySelector(".flip-front");
+  var back = card.querySelector(".flip-back");
+  var frontBadge = card.querySelector(".flip-front .flip-badge");
+  var backBadge = card.querySelector(".flip-back-badge");
+  if (front) front.setAttribute("aria-hidden", flipped ? "true" : "false");
+  if (back) back.setAttribute("aria-hidden", flipped ? "false" : "true");
+  if (backBadge) backBadge.setAttribute("aria-hidden", flipped ? "false" : "true");
+
+  // only the button on the visible side stays in the tab order
+  if (frontBadge) frontBadge.setAttribute("tabindex", flipped ? "-1" : "0");
+  if (backBadge) backBadge.setAttribute("tabindex", flipped ? "0" : "-1");
+
+  // the button that was just activated is now hidden, so move focus to
+  // its counterpart on the visible side (it is disabled until its fade
+  // completes, so focus is restored there when it becomes active)
+  var target = flipped ? backBadge : frontBadge;
+  if (target) target.focus({ preventScroll: true });
+
+  if (target) {
+    // a generation counter keeps a stale timeout from enabling a button
+    // after the card has already been flipped again
+    var gen = (card._flipGen || 0) + 1;
+    card._flipGen = gen;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var timing = flipTiming();
+    var delay = reduce ? 0 : timing.flip + timing.fade;
+    setTimeout(function () {
+      if (card._flipGen !== gen) return;
+      target.disabled = false;
+      // restore focus to the freshly-appeared button if the flip
+      // dropped it (it was disabled, so focus fell back to the body)
+      if (document.activeElement === document.body) {
+        target.focus({ preventScroll: true });
+      }
+    }, delay);
+  }
+}
+
+// background video: plays forward, then reverses before the end
+// for a seamless ping-pong loop (no restart jump). playbackRate can't
+// go negative in Chromium, so we drive currentTime manually.
+function initBackgroundVideo() {
+  var video = document.getElementById("bg-video");
+  if (!video) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  var EDGE = 0.4; // seconds from each end before turning around
+  var direction = 1;
+  var started = false;
+  var last = null; // timestamp of the previous frame
+  var pos = null; // our own position, so play()'s clock can't race us
+
+  function step(now) {
+    if (video.duration && isFinite(video.duration)) {
+      // drive from real elapsed time: a delayed frame (throttled tab,
+      // busy main thread) slows the loop instead of stuttering it
+      var delta = last === null ? 1 / 30 : Math.min((now - last) / 1000, 0.5);
+      last = now;
+      if (pos === null) pos = video.currentTime;
+
+      pos += direction * delta;
+      if (direction === 1 && pos >= video.duration - EDGE) {
+        direction = -1;
+        pos = video.duration - EDGE;
+      } else if (direction === -1 && pos <= EDGE) {
+        direction = 1;
+        pos = EDGE;
+      }
+      video.currentTime = pos;
+    }
+    requestAnimationFrame(step);
+  }
+
+  function start() {
+    if (started) return;
+    started = true;
+    // play() (muted, so no autoplay issue) keeps mobile browsers
+    // rendering frames; the stepping below controls the position.
+    video.play().catch(function () {});
+    requestAnimationFrame(step);
+  }
+
+  // pause in the background so play()'s clock can't race ahead of our
+  // manual position, then resume where we left off
+  document.addEventListener("visibilitychange", function () {
+    if (!started) return;
+    if (document.hidden) {
+      video.pause();
+    } else {
+      video.play().catch(function () {});
+    }
+  });
+
+  video.addEventListener("loadedmetadata", start);
+  // a cached video can fire loadedmetadata before this script runs
+  if (video.readyState >= 1) start();
+}
+
+// flips a card when its arrow button is clicked; the buttons are real
+// <button> elements, so Enter/Space activation works natively
+function initFlipCards() {
+  document.addEventListener("click", function (e) {
+    if (!(e.target instanceof Element)) return;
+    var badge = e.target.closest(".flip-badge");
+    if (!badge || badge.disabled) return; // ignore clicks while fading in
+    var card = badge.closest(".flip-card");
+    if (card) toggleFlipCard(card);
+  });
+}
+
+// startup
 initScrollEffect();
 initMobileNav();
+initFlipCards();
+initBackgroundVideo();
 
 document.addEventListener("DOMContentLoaded", async function () {
   var popout = document.getElementById("popout-form");
@@ -339,10 +514,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   await loadMainPage();
   await pageFetch();
+  initScrollSpy();
 
-  // guard each button: if its page failed to load, don't crash the rest of startup
   var discover = document.getElementById("discover");
   var loadForm = document.getElementById("load-form");
+  var navCta = document.getElementById("nav-cta");
   if (discover) discover.addEventListener("click", revealSections);
   if (loadForm) loadForm.addEventListener("click", loadFormPage);
+  if (navCta) navCta.addEventListener("click", loadFormPage);
 });

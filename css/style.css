@@ -1,6 +1,4 @@
-/* ==================================================== */
-/*                    base & utilities                   */
-/* ==================================================== */
+/* base */
 
 *,
 *::before,
@@ -11,7 +9,7 @@
 :root {
   --secondary: #f98014;
   --primary: #052950;
-  --text-muted: #5e636d;
+  --text-muted: #9ea3ad;
   --general-border: 1px solid #d9dfe8;
   --hover-border: 1px solid #5b7191;
   --general-radius: 20px;
@@ -19,13 +17,34 @@
   --translate-active: translateY(-3px);
   --general-transition: all 0.25s ease;
   --general-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  --flip-duration: 0.65s;
+  --badge-fade: 0.3s;
 }
 
 body {
   margin: 0;
-  padding-top: 26px;
+  padding-top: 100px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  background-color: #f6fcff;
+}
+
+.bg-video-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+
+  .bg-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .bg-veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* a full-width page section */
@@ -33,8 +52,7 @@ body {
   display: flex;
   flex-wrap: wrap-reverse;
   overflow-wrap: anywhere;
-  padding: 4% 3%;
-  margin: 3% 0;
+  padding: 2% 4% 4% 4%;
   gap: 1%;
 
   & > * {
@@ -42,7 +60,7 @@ body {
   }
 }
 
-/* a stacked text block (used as a section's intro / left column) */
+/* section intro text block */
 .hero {
   display: flex;
   flex-direction: column;
@@ -61,16 +79,22 @@ body {
   .subtitle {
     color: var(--secondary);
     text-transform: uppercase;
+    font-weight: 700;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+    font-size: 18px;
   }
 
   .title {
     font-size: 44px;
     margin: 0;
+    color: #fff;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
   }
 
   .description {
     font-size: medium;
     color: var(--text-muted);
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
   }
 
   button {
@@ -106,7 +130,7 @@ body {
   }
 }
 
-/* a square icon badge (48x48 rounded box) */
+/* square icon badge */
 .icon {
   width: 48px;
   height: 48px;
@@ -118,9 +142,7 @@ body {
   grid-row: 1 / 3;
 }
 
-/* ==================================================== */
-/*                      index.html                      */
-/* ==================================================== */
+/* index */
 
 .site-header {
   position: fixed;
@@ -128,48 +150,116 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 0 40px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 16px 40px;
+  background: transparent;
 
+  /* bordered box: brand | pill nav | CTA (stays white over the video) */
   .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
+    gap: 24px;
+    padding: 8px 10px 8px 20px;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 18px;
   }
 
-  h1 {
+  .brand {
     margin: 0;
-    font-size: 25px;
+    font-size: 22px;
+    font-weight: 700;
     color: #000;
+    white-space: nowrap;
 
     span {
-      font-size: 25px;
+      font-size: 20px;
       color: #fff;
       background-color: #052950;
-      border-radius: 18%;
-      padding: 8px;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-right: 5px;
     }
   }
 
-  nav {
+  /* light-gray pill holding the nav links */
+  .nav-pill {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    background: #f1f3f6;
+    border-radius: 999px;
+
     ul {
       display: flex;
-      gap: 20px;
+      gap: 2px;
       list-style: none;
       margin: 0;
       padding: 0;
 
-      li {
-        a {
-          padding: 5px 5px;
-          text-decoration: none;
-          display: block;
+      li a {
+        display: block;
+        padding: 9px 16px;
+        border-radius: 999px;
+        text-decoration: none;
+        color: #3a3f47;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+        transition: var(--general-transition);
+
+        /* the active link (current section) looks like it's hovering */
+        &:hover,
+        &.active {
+          background: #fff;
           color: #000;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
       }
+    }
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* black pill CTA with a white arrow circle */
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    padding: 9px 10px 9px 22px;
+    background: #111;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: var(--general-transition);
+
+    &:hover {
+      background: #333;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .cta-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      color: #111;
+      font-size: 0.85rem;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover .cta-arrow {
+      transform: rotate(45deg);
     }
   }
 }
@@ -254,9 +344,7 @@ body {
   }
 }
 
-/* ==================================================== */
-/*                       home.html                      */
-/* ==================================================== */
+/* home */
 
 .home {
   .image {
@@ -273,13 +361,9 @@ body {
   }
 }
 
-/* ==================================================== */
-/*                      about.html                      */
-/* ==================================================== */
+/* about */
 
 .about {
-  background-color: #fff;
-
   .content {
     .list {
       > p {
@@ -319,9 +403,18 @@ body {
   }
 }
 
-/* ==================================================== */
-/*                     service.html                     */
-/* ==================================================== */
+/* card-flip back button: fades in only once the flip (0.65s) has
+   finished, so it never pops in mid-turn */
+@keyframes badge-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* service */
 
 .service {
   display: flex;
@@ -344,53 +437,245 @@ body {
       flex: 0 0 calc((100% - 45px) / 4);
     }
 
-    .card {
-      display: grid;
-      grid-template-rows: 1fr auto auto;
-      background: #fff;
-      padding: 2%;
-      border: var(--general-border);
+    /* flat wrapper: gives the 3D depth and takes the hover lift, while
+       the .card inside does the actual 180° rotation. The back arrow
+       button also lives here, outside the rotation, so it stays flat
+       and hoverable in every state. */
+    /* this wrapper's fixed height is what sizes the whole card
+       (.card inside fills it at 100%) */
+    .flip-card {
+      position: relative;
+      height: 600px;
       border-radius: var(--general-radius);
+      perspective: 1400px;
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
 
-      .description {
-        display: flex;
-        flex-direction: column;
-
-        span {
-          color: #eef3f8;
-          background: #052950;
-        }
-
-        h1 {
-          font-size: 18px;
-        }
-
-        p {
-          color: #5e636d;
-          line-height: 1.5;
-        }
-      }
-
-      hr {
+      /* the card element itself IS the whole panel — the grid that stacks
+         the two faces — and it rotates as one rigid piece: white panel,
+         border and faces all turn together. There is no inner wrapper, so
+         nothing else could appear to rotate. */
+      .card {
+        position: relative;
+        display: grid;
         width: 100%;
-        margin: 2rem 0;
+        height: 100%;
+        background: #fff;
+        border: var(--general-border);
+        border-radius: var(--general-radius);
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        transition:
+          transform var(--flip-duration) cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 0.25s ease;
+
+        /* both faces share the same grid cell */
+        .flip-face {
+          grid-area: 1 / 1;
+          display: flex;
+          flex-direction: column;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+
+        /* front face: image + hover blur + title */
+        .flip-front {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--general-radius);
+
+            img {
+              border-radius: var(--general-radius);
+              width: 100%;
+              flex: 1;
+              min-height: 0;
+              object-fit: cover;
+              transition:
+                filter 0.4s ease,
+                transform 0.6s ease;
+            }
+
+            /* hover veil */
+            &::after {
+              content: "";
+              position: absolute;
+              inset: 0;
+              background: rgba(5, 41, 80, 0.55);
+              opacity: 0;
+              transition: opacity 0.4s ease;
+            }
+
+            .flip-title {
+              position: absolute;
+              inset: 0;
+              z-index: 1;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              padding: 18px;
+              opacity: 0;
+              transform: translateY(16px);
+              transition:
+                opacity 0.4s ease,
+                transform 0.4s ease;
+              pointer-events: none;
+
+              h1 {
+                margin: 0;
+                color: #fff;
+                font-size: 1.35rem;
+                text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+              }
+            }
+          }
+
+          /* back face: the original card content */
+          .flip-back {
+            position: relative;
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+            padding: 6% 7%;
+            overflow-y: auto;
+            border-radius: var(--general-radius);
+
+            /* tighter sizing so the back face fits */
+            .icon {
+              width: 40px;
+              height: 40px;
+              font-size: 1rem;
+            }
+
+            .description {
+              display: flex;
+              flex-direction: column;
+
+              span {
+                color: #eef3f8;
+                background: #052950;
+              }
+
+              h1 {
+                font-size: 18px;
+                margin: 10px 0 0;
+              }
+
+              p {
+                color: #5e636d;
+                line-height: 1.45;
+                margin: 8px 0 0;
+              }
+            }
+
+            hr {
+              width: 100%;
+              margin: 1.2rem 0;
+              border: none;
+              border-top: 1px solid #d9dfe8;
+            }
+
+            .list {
+              flex-direction: column;
+
+              p {
+                padding: 8px 0;
+              }
+            }
+          }
+        }
+
+      /* flip buttons: open (front, bottom-right) / back (bottom-left).
+         Base styles live on the flat wrapper so both the front badge
+         (inside the rotating card) and the back badge (outside it)
+         share them. */
+      .flip-badge {
+        position: absolute;
+        bottom: 14px;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
         border: none;
-        border-top: 1px solid #d9dfe8;
+        padding: 0;
+        background: var(--primary);
+        color: #fff;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.3s ease,
+          background 0.25s ease;
+
+        &:hover {
+          background: var(--secondary);
+          transform: scale(1.08);
+        }
+
+        &:focus-visible {
+          outline: 3px solid var(--secondary);
+          outline-offset: 2px;
+        }
       }
 
-      .list {
-        flex-direction: column;
+      /* the front button fades in only after the card has flipped back
+         to the front (mirror of the back button). The :not(.flipped)
+         part stops matching while the card is flipped, which restarts
+         the animation on every unflip. */
+      &:not(.flipped) .flip-front .flip-badge {
+        right: 14px;
+        animation: badge-fade-in var(--badge-fade) ease var(--flip-duration) both;
+      }
+
+      /* the back button is a flat child of the wrapper (outside the 3D
+         rotation), shown only while the card is flipped. opacity: 0 is
+         the resting state so the delayed fade-in animation can never
+         flash it at full opacity for a frame while it sets up. */
+      .flip-back-badge {
+        left: 14px;
+        display: none;
+        opacity: 0;
+      }
+
+      /* flipped state: the card itself rotates 180° */
+      &.flipped .card {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      /* the back button fades in only after the flip has finished, so
+         it never appears mid-turn */
+      &.flipped .flip-back-badge {
+        display: flex;
+        animation: badge-fade-in var(--badge-fade) ease var(--flip-duration) both;
+      }
+
+      /* hover on the front face only: blur the image and show the title */
+      &:not(.flipped):hover .flip-front {
+        img {
+          filter: blur(6px) brightness(0.75);
+          transform: scale(1.06);
+        }
+
+        &::after {
+          opacity: 1;
+        }
+
+        .flip-title {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     }
   }
 }
 
-/* ==================================================== */
-/*                       why.html                       */
-/* ==================================================== */
+/* why */
 
 .why {
-  background-color: #fff;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -408,6 +693,7 @@ body {
 
     > p {
       flex: 0 0 calc((100% - 45px) / 3);
+      background-color: #fff;
       border: 1px solid var(--secondary);
       border-radius: var(--general-radius);
       gap: 10px;
@@ -421,12 +707,9 @@ body {
   }
 }
 
-/* ==================================================== */
-/*                     process.html                     */
-/* ==================================================== */
+/* process */
 
 .process {
-  background-color: var(--primary);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -435,14 +718,6 @@ body {
 
   .content {
     align-items: center;
-
-    .title {
-      color: #fff;
-    }
-
-    .description {
-      color: #999999;
-    }
   }
 
   .card-holder {
@@ -492,9 +767,7 @@ body {
   }
 }
 
-/* ==================================================== */
-/*                     contact.html                     */
-/* ==================================================== */
+/* contact */
 
 .contact {
   .card-holder {
@@ -533,9 +806,7 @@ body {
   }
 }
 
-/* ==================================================== */
-/*                      form.html                       */
-/* ==================================================== */
+/* form */
 
 .popout {
   position: fixed;
@@ -549,7 +820,7 @@ body {
   z-index: 99999;
   padding: 20px;
 
-  /* opening the popout (js/script.js adds .active) */
+  /* open state */
   &.active {
     display: flex;
   }
@@ -692,7 +963,7 @@ body {
       }
     }
 
-    /* the X close button */
+    /* close button */
     .close {
       position: absolute;
       top: 18px;
@@ -708,7 +979,7 @@ body {
       }
     }
 
-    /* success screen (shown after a valid submit) */
+    /* success screen */
     .form-success {
       text-align: center;
       padding: 20px 0;

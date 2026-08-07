@@ -30,23 +30,49 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.bg-video-wrap {
+/* full-screen background image (replaces the old background video). The
+   image is oversized with a slight blur and slowly drifts behind the
+   content, so the background feels alive without any video file. */
+.bg-image-wrap {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
+  /* fallback while (or if) the image isn't there yet: keep the white
+     hero text readable instead of a blank white page */
+  background: #052950;
 
-  .bg-video {
-    width: 100%;
-    height: 100%;
+  .bg-image {
+    position: absolute;
+    /* extra bleed so the drift can travel far without exposing edges */
+    inset: -10%;
+    width: 120%;
+    height: 120%;
     object-fit: cover;
+    filter: blur(3px);
+    will-change: transform;
+    animation: bg-drift 18s ease-in-out infinite alternate;
   }
 
   .bg-veil {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.1);
+    /* white wash: lightens the image slightly so content pops */
+    background: rgba(184, 184, 184, 0.15);
+  }
+}
+
+/* pan + zoom (Ken Burns): the background visibly glides sideways and
+   slightly upward while slowly zooming in, then reverses. The bleed
+   from inset/width keeps the edges hidden at every point of the drift. */
+@keyframes bg-drift {
+  from {
+    transform: scale(1.05) translate(0, 0);
+  }
+
+  to {
+    transform: scale(1.1) translate(-6%, -2%);
   }
 }
 

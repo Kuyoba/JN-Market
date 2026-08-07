@@ -120,6 +120,25 @@
   }
 }
 
+/* scroll-triggered card reveal: cards stay hidden until their section
+   scrolls into view, then fade + slide in once (classes are added by
+   JS, so no-JS / reduced-motion visitors see them plainly) */
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+.reveal-up {
+  transform: translateY(40px);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
 /* index */
 
 html {
@@ -385,8 +404,10 @@ html {
     transition: none;
   }
 
-  .bg-video-wrap {
-    display: none;
+  /* the background image is fine under reduced motion — just freeze
+     its drift so nothing moves */
+  .bg-image {
+    animation: none;
   }
 
   /* with animations off, the back button's resting opacity (0) would

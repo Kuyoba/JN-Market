@@ -251,12 +251,8 @@ function initMobileNav() {
   });
 }
 
-// keeps the freshly-loaded main page (and footer, so the page doesn't
-// look broken mid-wait) hidden until the background video has a frame
-// to render, so on slow connections the content and the video appear
-// together instead of the page flashing in over an empty video
-function revealWhenVideoReady(page) {
-  var video = document.getElementById("bg-video");
+function revealWhenBackgroundReady(page) {
+  var img = document.getElementById("bg-image");
   var footer = document.querySelector(".site-footer");
   var revealed = false;
 
@@ -267,14 +263,8 @@ function revealWhenVideoReady(page) {
     if (footer) footer.classList.remove("hidden");
   }
 
-  // reduced-motion users never get the video; don't gate the page on it
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    reveal();
-    return;
-  }
-
-  // no video to wait for, or it already has its first frame
-  if (!video || video.readyState >= 2) {
+  // no image to wait for, or it already finished loading (e.g. cached)
+  if (!img || (img.complete && img.naturalWidth > 0)) {
     reveal();
     return;
   }
@@ -282,16 +272,10 @@ function revealWhenVideoReady(page) {
   page.classList.add("hidden");
   if (footer) footer.classList.add("hidden");
 
-  var onReady = function () {
-    reveal();
-  };
-  if (video) {
-    video.addEventListener("loadeddata", onReady);
-    video.addEventListener("canplay", onReady);
-    video.addEventListener("error", onReady);
-  }
+  img.addEventListener("load", reveal);
+  img.addEventListener("error", reveal);
 
-  // safety net: never leave the page hidden if the video stalls
+  // safety net: never leave the page hidden if the image stalls
   setTimeout(reveal, 8000);
 }
 
@@ -306,7 +290,7 @@ async function loadMainPage() {
 
     const data = await response.text();
     container.innerHTML = data;
-    revealWhenVideoReady(container);
+    revealWhenBackgroundReady(container);
   } catch (err) {
     console.warn(`Failed to load pages/home.html:`, err.message);
   }
@@ -337,9 +321,7 @@ async function pageFetch() {
   }
 }
 
-// clicking a nav/footer section link while the sections are still hidden
-// would do nothing (its target is display: none), so reveal all sections
-// first, then scroll to the chosen one
+
 function initSectionLinks() {
   var sectionIds = ["about", "service", "why", "process", "contact"];
   var links = document.querySelectorAll(
@@ -382,6 +364,63 @@ function initSectionLinks() {
         });
       }, delay);
     });
+  });
+}
+
+// scroll-triggered card reveal: cards slide/fade in the first time
+// their section scrolls into view (IntersectionObserver), instead of
+// all animating when the page loads. The reveal classes are added from
+// JS, so cards stay fully visible without JS or under reduced motion.
+function initScrollReveal() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!("IntersectionObserver" in window)) return;
+
+  var groups = [
+    ".about .stats > div",
+    ".service .card-holder .flip-card",
+    ".why .list > p",
+    ".process .card-holder .card",
+    ".contact .card-holder .card",
+  ];
+
+  var pending = [];
+  groups.forEach(function (selector) {
+    document.querySelectorAll(selector).forEach(function (card, index) {
+      // stagger each card within its group for a cascade effect
+      card.classList.add("reveal", "reveal-up");
+      card._revealDelay = index * 90;
+      pending.push(card);
+    });
+  });
+
+  if (!pending.length) return;
+
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var card = entry.target;
+        var delay = card._revealDelay || 0;
+
+        // inline transition (with the stagger delay) so it wins over
+        // the cards' own hover transitions, then play once and clean up
+        card.style.transition =
+          "opacity 0.7s ease " + delay + "ms, transform 0.7s ease " + delay + "ms";
+        card.classList.add("revealed");
+        observer.unobserve(card);
+
+        setTimeout(function () {
+          card.classList.remove("reveal", "reveal-up", "revealed");
+          card.style.transition = "";
+          delete card._revealDelay;
+        }, delay + 800);
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  pending.forEach(function (card) {
+    observer.observe(card);
   });
 }
 
@@ -516,67 +555,6 @@ function toggleFlipCard(card) {
   }
 }
 
-// background video: plays forward, then reverses before the end
-// for a seamless ping-pong loop (no restart jump). playbackRate can't
-// go negative in Chromium, so we drive currentTime manually.
-function initBackgroundVideo() {
-  var video = document.getElementById("bg-video");
-  if (!video) return;
-
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-  var EDGE = 0.4; // seconds from each end before turning around
-  var direction = 1;
-  var started = false;
-  var last = null; // timestamp of the previous frame
-  var pos = null; // our own position, so play()'s clock can't race us
-
-  function step(now) {
-    if (video.duration && isFinite(video.duration)) {
-      // drive from real elapsed time: a delayed frame (throttled tab,
-      // busy main thread) slows the loop instead of stuttering it
-      var delta = last === null ? 1 / 30 : Math.min((now - last) / 1000, 0.5);
-      last = now;
-      if (pos === null) pos = video.currentTime;
-
-      pos += direction * delta;
-      if (direction === 1 && pos >= video.duration - EDGE) {
-        direction = -1;
-        pos = video.duration - EDGE;
-      } else if (direction === -1 && pos <= EDGE) {
-        direction = 1;
-        pos = EDGE;
-      }
-      video.currentTime = pos;
-    }
-    requestAnimationFrame(step);
-  }
-
-  function start() {
-    if (started) return;
-    started = true;
-    // play() (muted, so no autoplay issue) keeps mobile browsers
-    // rendering frames; the stepping below controls the position.
-    video.play().catch(function () {});
-    requestAnimationFrame(step);
-  }
-
-  // pause in the background so play()'s clock can't race ahead of our
-  // manual position, then resume where we left off
-  document.addEventListener("visibilitychange", function () {
-    if (!started) return;
-    if (document.hidden) {
-      video.pause();
-    } else {
-      video.play().catch(function () {});
-    }
-  });
-
-  video.addEventListener("loadedmetadata", start);
-  // a cached video can fire loadedmetadata before this script runs
-  if (video.readyState >= 1) start();
-}
-
 // flips a card when its arrow button is clicked; the buttons are real
 // <button> elements, so Enter/Space activation works natively
 function initFlipCards() {
@@ -593,7 +571,6 @@ function initFlipCards() {
 initScrollEffect();
 initMobileNav();
 initFlipCards();
-initBackgroundVideo();
 
 document.addEventListener("DOMContentLoaded", async function () {
   var popout = document.getElementById("popout-form");
@@ -609,6 +586,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   await pageFetch();
   initScrollSpy();
   initSectionLinks();
+  initScrollReveal();
 
   var discover = document.getElementById("discover");
   var loadForm = document.getElementById("load-form");

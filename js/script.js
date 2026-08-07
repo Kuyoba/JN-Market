@@ -251,6 +251,50 @@ function initMobileNav() {
   });
 }
 
+// keeps the freshly-loaded main page (and footer, so the page doesn't
+// look broken mid-wait) hidden until the background video has a frame
+// to render, so on slow connections the content and the video appear
+// together instead of the page flashing in over an empty video
+function revealWhenVideoReady(page) {
+  var video = document.getElementById("bg-video");
+  var footer = document.querySelector(".site-footer");
+  var revealed = false;
+
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    page.classList.remove("hidden");
+    if (footer) footer.classList.remove("hidden");
+  }
+
+  // reduced-motion users never get the video; don't gate the page on it
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    reveal();
+    return;
+  }
+
+  // no video to wait for, or it already has its first frame
+  if (!video || video.readyState >= 2) {
+    reveal();
+    return;
+  }
+
+  page.classList.add("hidden");
+  if (footer) footer.classList.add("hidden");
+
+  var onReady = function () {
+    reveal();
+  };
+  if (video) {
+    video.addEventListener("loadeddata", onReady);
+    video.addEventListener("canplay", onReady);
+    video.addEventListener("error", onReady);
+  }
+
+  // safety net: never leave the page hidden if the video stalls
+  setTimeout(reveal, 8000);
+}
+
 // loads the home page
 async function loadMainPage() {
   const container = document.getElementById("main-page");
@@ -262,6 +306,7 @@ async function loadMainPage() {
 
     const data = await response.text();
     container.innerHTML = data;
+    revealWhenVideoReady(container);
   } catch (err) {
     console.warn(`Failed to load pages/home.html:`, err.message);
   }

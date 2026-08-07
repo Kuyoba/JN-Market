@@ -188,7 +188,7 @@ html {
       &:hover {
         transform: var(--translate-hover);
         border: var(--hover-border);
-        box-shadow: var(--general-shadow);
+        box-shadow: var(--white-shadow-hover);
       }
     }
   }
@@ -203,7 +203,7 @@ html {
          never rotates, so this transform never fights the flip) */
       &:hover {
         transform: translateY(-6px);
-        box-shadow: var(--general-shadow);
+        box-shadow: var(--white-shadow-hover);
       }
 
       /* the panel's border lives on the rotating .card */
@@ -223,7 +223,7 @@ html {
 
       &:hover {
         transform: var(--translate-hover);
-        box-shadow: var(--general-shadow);
+        box-shadow: var(--white-shadow-hover);
         border: 1px solid #5b7191;
       }
     }
@@ -248,7 +248,7 @@ html {
 
       &:hover {
         transform: translateX(6px);
-        box-shadow: -3px 0px 8px rgba(107, 85, 207, 0.5);
+        box-shadow: var(--white-shadow-hover);
         border: var(--general-border);
       }
     }
@@ -265,7 +265,7 @@ html {
       &:hover {
         border: var(--hover-border);
         transform: var(--translate-hover);
-        box-shadow: var(--general-shadow);
+        box-shadow: var(--white-shadow-hover);
       }
     }
   }
@@ -686,7 +686,7 @@ body.menu-open {
     height: 38px;
     bottom: 12px;
   }
-
+  
   .service .card-holder .flip-card .flip-front .flip-badge {
     right: 12px;
   }

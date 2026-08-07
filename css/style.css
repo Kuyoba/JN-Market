@@ -17,6 +17,9 @@
   --translate-active: translateY(-3px);
   --general-transition: all 0.25s ease;
   --general-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  /* soft white glow behind cards/lists; strengthens on hover */
+  --white-shadow: 0 0 22px rgba(255, 255, 255, 0.2);
+  --white-shadow-hover: 0 0 32px rgba(255, 255, 255, 0.45);
   --flip-duration: 0.65s;
   --badge-fade: 0.3s;
 }
@@ -385,6 +388,7 @@ body {
       background-color: #fff;
       border: var(--general-border);
       border-radius: var(--general-radius);
+      box-shadow: var(--white-shadow);
       padding: 0 5%;
       display: flex;
       flex-direction: column;
@@ -448,6 +452,7 @@ body {
       height: 600px;
       border-radius: var(--general-radius);
       perspective: 1400px;
+      box-shadow: var(--white-shadow);
       transition:
         transform 0.25s ease,
         box-shadow 0.25s ease;
@@ -703,6 +708,7 @@ body {
       background-color: #fff;
       border: 1px solid var(--secondary);
       border-radius: var(--general-radius);
+      box-shadow: var(--white-shadow);
       gap: 10px;
     }
 
@@ -749,6 +755,7 @@ body {
         background: #1e3f75;
         border: 1px solid #5b7191;
         border-radius: var(--general-radius);
+        box-shadow: var(--white-shadow);
         display: grid;
         grid-template-rows: repeat(3, 0.5fr);
 
@@ -791,6 +798,7 @@ body {
       border: 1px solid #dfe6ef;
       border-radius: 18px;
       background: #fff;
+      box-shadow: var(--white-shadow);
 
       span {
         background: #eef3f8;

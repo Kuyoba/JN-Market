@@ -292,6 +292,54 @@ async function pageFetch() {
   }
 }
 
+// clicking a nav/footer section link while the sections are still hidden
+// would do nothing (its target is display: none), so reveal all sections
+// first, then scroll to the chosen one
+function initSectionLinks() {
+  var sectionIds = ["about", "service", "why", "process", "contact"];
+  var links = document.querySelectorAll(
+    '.nav-pill a[href^="#"], .site-footer nav a[href^="#"]'
+  );
+
+  links.forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      var id = link.getAttribute("href").slice(1);
+      if (sectionIds.indexOf(id) === -1) return;
+
+      // if no target section is hidden anymore, let the default anchor
+      // jump run (CSS scroll-behavior: smooth handles the glide)
+      var anyHidden = sectionIds.some(function (sid) {
+        var section = document.getElementById(sid);
+        return section && section.classList.contains("hidden");
+      });
+      if (!anyHidden) return;
+
+      e.preventDefault();
+      revealSections();
+      try {
+        if (history.pushState) history.pushState(null, "", "#" + id);
+      } catch (err) {
+        // sandboxed contexts can throw on pushState; the scroll below
+        // is what matters
+      }
+
+
+      var target = document.getElementById(id);
+      if (!target) return;
+      var delay = target.classList.contains("page") ? 150 : 0;
+      setTimeout(function () {
+        var reduce = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+        target.scrollIntoView({
+          behavior: reduce ? "auto" : "smooth",
+          block: "start",
+        });
+      }, delay);
+    });
+  });
+}
+
 // reveals the hidden sections when "en savoir plus" is clicked
 function revealSections() {
   var container = document.getElementById("sub-pages");
@@ -515,6 +563,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   await loadMainPage();
   await pageFetch();
   initScrollSpy();
+  initSectionLinks();
 
   var discover = document.getElementById("discover");
   var loadForm = document.getElementById("load-form");

@@ -64,6 +64,40 @@
   }
 }
 
+/* vertical twin of wrapArrow: on mobile the arrow points down
+   (rotate(90deg)), so the wrap must slide along Y and keep that
+   rotation — otherwise it snaps horizontal and hops sideways */
+@keyframes wrapArrowDown {
+  0% {
+    transform: rotate(90deg) translateY(0);
+    opacity: 1;
+  }
+
+  45% {
+    transform: rotate(90deg) translateY(20px);
+    opacity: 1;
+  }
+
+  50% {
+    transform: rotate(90deg) translateY(20px);
+    opacity: 0;
+  }
+
+  51% {
+    transform: rotate(90deg) translateY(-20px);
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(90deg) translateY(0);
+    opacity: 1;
+  }
+}
+
 @keyframes popoutFade {
   from {
     opacity: 0;
@@ -139,7 +173,9 @@
   transform: none;
 }
 
-/* index */
+/* ============================================================
+   HEADER / NAVIGATION
+   ============================================================ */
 
 html {
   scroll-behavior: smooth;
@@ -156,30 +192,9 @@ html {
   }
 }
 
-.site-footer {
-  nav {
-    ul {
-      li {
-        a {
-          transition: all 0.3s ease;
-
-          &:hover {
-            color: #cfd8e0;
-            text-shadow: 0 6px 5px rgba(0, 0, 0, 0.5);
-            scale: 1.1;
-
-            &:active {
-              color: #96a1ab;
-              scale: 1;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-/* home */
+/* ============================================================
+   HOME
+   ============================================================ */
 
 .home {
   .button {
@@ -197,7 +212,9 @@ html {
   }
 }
 
-/* about */
+/* ============================================================
+   ABOUT
+   ============================================================ */
 
 .about {
   .stats {
@@ -213,7 +230,9 @@ html {
   }
 }
 
-/* service */
+/* ============================================================
+   SERVICES
+   ============================================================ */
 
 .service {
   .card-holder {
@@ -233,7 +252,9 @@ html {
   }
 }
 
-/* why */
+/* ============================================================
+   WHY US
+   ============================================================ */
 
 .why {
   .list {
@@ -249,7 +270,9 @@ html {
   }
 }
 
-/* process */
+/* ============================================================
+   PROCESS
+   ============================================================ */
 
 .process {
   .card-holder {
@@ -274,7 +297,9 @@ html {
   }
 }
 
-/* contact */
+/* ============================================================
+   CONTACT
+   ============================================================ */
 
 .contact {
   .card-holder {
@@ -290,7 +315,9 @@ html {
   }
 }
 
-/* form popout */
+/* ============================================================
+   MODAL / POPOUT
+   ============================================================ */
 
 .popout {
   &.active {
@@ -315,7 +342,7 @@ html {
       .input-group {
         input,
         textarea {
-          transition: 0.25s;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 
           &:focus {
             border-color: #0f5eb3;
@@ -325,13 +352,13 @@ html {
         }
 
         span {
-          transition: all 0.3s ease;
+          transition: color 0.3s ease, opacity 0.3s ease;
         }
       }
 
       .button-group {
         button {
-          transition: 0.25s;
+          transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
         }
 
         button[type="submit"] {
@@ -394,12 +421,36 @@ html {
 /* reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
+  /* no smooth scrolling for anchor jumps either */
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* disable entrance/exit animations and hover transitions; layouts
+     stay identical, everything just happens instantly */
   .page,
   .site-header,
   .service .card-holder .flip-card,
   .service .card-holder .card,
   .service .flip-front img,
-  .service .card-holder .flip-badge {
+  .service .card-holder .flip-badge,
+  .page button,
+  .about .stats > div,
+  .why .list > p,
+  .process .card-holder .card,
+  .process .arrow,
+  .contact .card-holder .card,
+  .hero .btn-primary,
+  .hero .btn-secondary,
+  .nav-cta,
+  .nav-cta .cta-arrow,
+  .nav-toggle,
+  .site-header .nav-pill,
+  .site-header .nav-pill a,
+  .site-header .nav-phone,
+  .popout,
+  .popout .form,
+  .form-success {
     animation: none;
     transition: none;
   }
@@ -498,45 +549,65 @@ body.menu-open {
     font-size: 18px;
   }
 
-  /* the pill becomes the slide-in drawer; drop the CTA on small screens */
-  .site-header nav {
-    border-radius: 0;
-  }
-
+  /* the pill becomes a floating rounded drawer below the header;
+     the CTA is dropped on small screens (the hero CTA takes over) */
   .site-header .nav-cta {
     display: none;
   }
 
-  .site-header nav {
+  /* the drawer IS the .nav-pill element, so target it directly to beat
+     the base pill styles (equal specificity, later source) */
+  .site-header .nav-pill {
     position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    height: 100dvh;
-    width: min(78vw, 320px);
-    padding: 100px 24px 24px;
+    top: 84px;
+    right: 16px;
+    width: min(80vw, 320px);
+    max-height: calc(100dvh - 110px);
+    padding: 6px 10px 14px;
+    /* stack the drawer title above the links, full width */
+    flex-direction: column;
+    align-items: stretch;
     background: #fff;
-    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.18);
-    transform: translateX(100%);
+    border: 1px solid #dfe6ef;
+    border-radius: 24px;
+    box-shadow: 0 18px 50px rgba(5, 41, 80, 0.35);
+    overflow-y: auto;
+    transform: translateX(calc(100% + 16px));
     visibility: hidden;
     transition:
       transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
       visibility 0.35s;
     z-index: 1001;
 
+    /* small heading gives the panel an intentional top edge */
+    .nav-drawer-title {
+      display: block;
+      margin: 0;
+      padding: 14px 14px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #9aa3ad;
+    }
+
+
     ul {
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
 
       li {
         a {
-          font-size: 1.05rem;
-          padding: 14px 12px;
-          border-radius: 12px;
+          font-size: 1.02rem;
+          font-weight: 600;
+          padding: 13px 16px;
+          border-radius: 14px;
+          color: #26313d;
 
           &:hover,
           &.active {
-            background: #eef3f8;
+            background: #f1f3f6;
+            color: var(--primary);
             box-shadow: none;
             text-shadow: none;
             scale: 1;
@@ -546,7 +617,7 @@ body.menu-open {
     }
   }
 
-  .site-header.nav-open nav {
+  .site-header.nav-open .nav-pill {
     transform: translateX(0);
     visibility: visible;
   }
@@ -572,6 +643,38 @@ body.menu-open {
     &:hover {
       background: var(--primary);
       color: #fff;
+    }
+  }
+
+  /* phone contact button, beside the hamburger (scoped to beat the
+     base .site-header .nav-phone hide rule) */
+  .site-header .nav-phone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: #eef3f8;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: var(--general-transition);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    z-index: 1002;
+
+    .fi-rr-phone-call {
+      color: var(--secondary);
+    }
+
+    &:hover {
+      background: var(--primary);
+
+      .fi-rr-phone-call {
+        color: #fff;
+      }
     }
   }
 
@@ -620,7 +723,7 @@ body.menu-open {
   .about .stats > div {
     padding: 6%;
 
-    h1 {
+    .stat-value {
       font-size: 2rem;
     }
   }
@@ -664,6 +767,12 @@ body.menu-open {
 
       .arrow {
         transform: rotate(90deg);
+
+        /* the wrap animation must follow the arrow's new (downward)
+           direction instead of sliding it sideways */
+        &:hover {
+          animation: wrapArrowDown .9s linear;
+        }
       }
 
       div .card {

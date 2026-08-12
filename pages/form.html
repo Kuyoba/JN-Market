@@ -5,36 +5,46 @@
     </button>
 
     <div class="description">
-        <h2>Envoyez-nous un message</h2>
-        <p>nous répondons sous un jour ouvrable</p>
+        <h2 id="form-title">Envoyez-nous un message</h2>
+        <p id="form-desc">nous répondons sous un jour ouvrable</p>
     </div>
 
     <form novalidate name="form" action="https://api.web3forms.com/submit" method="POST">
         <input type="hidden" name="access_key" value="46418258-e9af-4abb-9d59-4e5377cde65a">
+        <!-- honeypot: bots fill hidden fields, Web3Forms silently drops them -->
+        <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" aria-hidden="true" autocomplete="off">
         <div class="input-group">
-            <label>Nom</label>
-            <input type="text" id="name" name="name" required>
-            <span id="name-res"></span>
+            <label for="name">Nom</label>
+            <input type="text" id="name" name="name" required aria-describedby="name-res">
+            <span id="name-res" aria-live="polite"></span>
         </div>
 
         <div class="row">
             <div class="input-group">
-                <label>E-mail</label>
-                <input type="email" id="email" name="email" required>
-                <span id="email-res"></span>
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required aria-describedby="email-res">
+                <span id="email-res" aria-live="polite"></span>
             </div>
 
             <div class="input-group">
-                <label>Téléphone</label>
-                <input type="text" id="phone" name="phone" required>
-                <span id="phone-res"></span>
+                <label for="phone">Téléphone</label>
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    aria-describedby="phone-res"
+                    pattern="[+]?[0-9][0-9 .\(\)\-]{6,19}"
+                    title="Numéro international, ex. +216 71 234 567"
+                >
+                <span id="phone-res" aria-live="polite"></span>
             </div>
         </div>
 
         <div class="input-group">
-            <label>Message</label>
-            <textarea id="message" name="message" required></textarea>
-            <span id="message-res"></span>
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required aria-describedby="message-res"></textarea>
+            <span id="message-res" aria-live="polite"></span>
         </div>
 
         <div class="button-group">
@@ -45,7 +55,7 @@
 
             <button type="reset">Annuler</button>
         </div>
-        <p id="form-error" class="form-error hidden"></p>
+        <p id="form-error" class="form-error hidden" role="alert"></p>
     </form>
 
     <div class="form-success hidden">
